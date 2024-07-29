@@ -6,8 +6,6 @@ import time
 import os
 import dyconnmap
 import bct
-from scipy import stats
-import pathlib
 start = time.time()
 
 def operations_to_perform():    # Change as desired
@@ -17,23 +15,26 @@ def operations_to_perform():    # Change as desired
 
 
 def setup_dependencies():    # Change as desired
-    input_dir = r'C:\Users\em17531\Downloads\LCMV_npy_output'     # The directory containing files of interest
-    output_dir = r'C:\Users\em17531\Desktop\New_project\graph_output_LCMV'    # The output directory
-    array_type = '_task-participant_conversation_broadband_lcmv_beamformer_time_averaged_roi_time_courses'     # This is the type of array that will be loaded for further calculations, eg. "participant_conversation_alpha"
+    input_dir = '//home/sahib/Documents/OPM_MEG/data'     # The directory containing files of interest
+    output_dir = '/home/sahib/Documents/OPM_MEG/Graph_outputs/Beta'    # The output directory
+    array_type = 'run-001'     # This is the type of array that will be loaded for further calculations, eg. "participant_conversation_alpha"
     target_fb = [13, 30]  # The target frequency band     TODO: set this up so variable can be a this can be list of bands and each generates it's own adjacency matrix
-    fs = 250    # The sampling frequency
+    band = '_beta_'
+    fs = 1200    # The sampling frequency
     saving = True
     os.makedirs(output_dir, exist_ok=True)
-    return input_dir, output_dir, array_type, fs, target_fb, saving
+    return input_dir, output_dir, array_type, fs, target_fb, saving, band
 
 
 def prep_data(input_dir, array_type):
     data = []
-    folder = pathlib.Path(input_dir).glob('*')
-    for file in folder:
-        if array_type in os.path.basename(file):
-            data.append(np.load(file))
-    return np.array([data[:, 0:16] for data in data])
+    for folder in os.listdir(input_dir):
+        for file in os.listdir(os.path.join(input_dir, folder)):
+            if array_type in os.path.basename(file):
+                target_array = np.load(os.path.join(input_dir, folder, file))
+                target_array = target_array[0:606000, :]
+                data.append(target_array)
+    return np.stack(data, axis=0)
 
 
 def wpli_conn(array, target_fb, fs):   # (participants, roi's, time_points)
@@ -77,7 +78,7 @@ def graph_metrics(adj_matrix):  # TODO: Add in stats, maybe nbs? Could use fdc a
 def main():     # TODO: put in the elif statements
     # Prep
     Cal_wpli, Cal_graph_metrics = operations_to_perform()
-    input_dir, output_dir, array_type, fs, target_fb, saving = setup_dependencies()
+    input_dir, output_dir, array_type, fs, target_fb, saving, band = setup_dependencies()
     data = prep_data(input_dir, array_type)
 
     # Core functions
@@ -88,11 +89,11 @@ def main():     # TODO: put in the elif statements
 
     # Saving
     if saving:
-        np.save(output_dir + '_All_Strength_beta_' + array_type, Strength)
-        np.save(output_dir + '_All_Betweenness_beta_' + array_type, Betweenness)
-        np.save(output_dir + '_All_Eigenvector_beta_' + array_type, Eigenvector)
-        np.save(output_dir + '_All_Clustering_beta_' + array_type, Clustering)
-        np.save(output_dir + '_Master_adj_matrix_beta_' + array_type, adj_matrix)
+        np.save(output_dir + '_All_Strength_' + band + array_type, Strength)
+        np.save(output_dir + '_All_Betweenness_' + band + array_type, Betweenness)
+        np.save(output_dir + '_All_Eigenvector_' + band + array_type, Eigenvector)
+        np.save(output_dir + '_All_Clustering_' + band + array_type, Clustering)
+        np.save(output_dir + '_Master_adj_matrix_' + band + array_type, adj_matrix)
 
 
 if __name__ == "__main__":
