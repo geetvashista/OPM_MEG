@@ -15,7 +15,7 @@ for folder in os.listdir(input_dir):
         if array_type in os.path.basename(file):
             target_array = np.load(os.path.join(input_dir, folder, file))
             target_array = target_array[0:606000, :]
-            data.append(target_array)
+            data.append(target_array.T)
 array = np.stack(data, axis=0)
 
 del data
