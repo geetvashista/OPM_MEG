@@ -14,9 +14,11 @@ mat_voxlox = scipy.io.loadmat(r'')
 adj = np.load(r'')
 hig = np.load(r'')
 
-# pep loc file
+# pep files
 loc = mat_voxlox['voxlox']
 del mat_voxlox
+
+adj = np.mean(adj, axis=0)
 
 # Plotting
 
