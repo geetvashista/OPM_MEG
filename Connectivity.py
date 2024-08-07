@@ -26,14 +26,15 @@ def setup_dependencies():    # Change as desired
     return input_dir, output_dir, array_type, fs, target_fb, saving, band
 
 
-def prep_data(input_dir, array_type):
+def prep_data(input_dir, array_type, target_fb, fs):
     data = []
     for folder in os.listdir(input_dir):
         for file in os.listdir(os.path.join(input_dir, folder)):
             if array_type in os.path.basename(file):
                 target_array = np.load(os.path.join(input_dir, folder, file))
                 target_array = target_array[0:606000, :]
-                data.append(target_array.T)
+                _, _, target_array = dyconnmap.analytic_signal(target_array.T, fb=target_fb, fs=fs)
+                data.append(target_array)
     return np.stack(data, axis=0)
 
 
@@ -79,7 +80,7 @@ def main():     # TODO: put in the elif statements
     # Prep
     Cal_wpli, Cal_graph_metrics = operations_to_perform()
     input_dir, output_dir, array_type, fs, target_fb, saving, band = setup_dependencies()
-    data = prep_data(input_dir, array_type)
+    data = prep_data(input_dir, array_type, target_fb, fs)
 
     # Core functions
     if Cal_wpli:
