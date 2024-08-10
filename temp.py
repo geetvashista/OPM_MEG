@@ -1,26 +1,48 @@
+import pandas as pd
 import numpy as np
-import os
-import dyconnmap
 
-input_dir = r'C:\Users\em17531\Desktop\OPM_MEG\data'  # The directory containing files of interest
-output_dir = r'C:\Users\em17531\Desktop\OPM_MEG\Graph_output\Beta'  # The output directory
-array_type = 'run-001'  # This is the type of array that will be loaded for further calculations, eg. "participant_conversation_alpha"
-target_fb = [13, 30]  # The target frequency band     TODO: set this up so variable can be a this can be list of bands and each generates it's own adjacency matrix
-band = '_beta_'
-fs = 1200
+# set paths and load data
 
-data = []
-for folder in os.listdir(input_dir):
-    for file in os.listdir(os.path.join(input_dir, folder)):
-        if array_type in os.path.basename(file):
-            target_array = np.load(os.path.join(input_dir, folder, file))
-            target_array = target_array[0:606000, :]
-            data.append(target_array.T)
-array = np.stack(data, axis=0)
+nodes_with_sig_edges = pd.read_excel('/home/sahib/Documents/OPM_MEG/derivatives/Nodes_with_sig_edges.xlsx')
 
-del data
-del target_array
+Strength = np.load('/home/sahib/Documents/OPM_MEG/derivatives/Theta/stats_Theta/Graph_stats/Graph_stats_Strength_Theta_P_val.npy')
+betweenness = np.load('/home/sahib/Documents/OPM_MEG/derivatives/Theta/stats_Theta/Graph_stats/Graph_stats_Betweenness_Theta_P_val.npy')
+eigenvec = np.load('/home/sahib/Documents/OPM_MEG/derivatives/Theta/stats_Theta/Graph_stats/Graph_stats_Eigenvector_Theta_P_val.npy')
+clustering = np.load('/home/sahib/Documents/OPM_MEG/derivatives/Theta/stats_Theta/Graph_stats/Graph_stats_Clustering_Theta_P_val.npy')
+output = '/home/sahib/Documents/OPM_MEG/derivatives/Theta/stats_Theta/sig_node_properties.xlsx'
 
-adj_matrix = []
-for participant in array:
-    adj_matrix.append(dyconnmap.fc.wpli(participant, fs=fs, fb=target_fb))
+def extract_indices_vals(array):
+    ind_list = []
+    val_list = []
+    for i, val in enumerate(array):
+        if val <= 0.05:
+            ind_list.append(i)
+            val_list.append(val)
+    Sig_info = np.stack([ind_list, val_list])
+    return Sig_info.T
+
+Strength_info = extract_indices_vals(Strength)
+Betweenness_info = extract_indices_vals(betweenness)
+Eigenvector_info = extract_indices_vals(eigenvec)
+Clustering_info = extract_indices_vals(clustering)
+del Strength
+del betweenness
+del eigenvec
+del clustering
+
+max_len = max(len(Strength_info), len(Betweenness_info), len(Eigenvector_info), len(Clustering_info))
+
+def prep_array(org_array, max_len):
+    current_coll, current_row = org_array.shape
+    empty__array = np.full([max_len, 2], np.nan)
+    empty__array[:current_coll, :current_row] = org_array
+    return empty__array
+
+df1 = pd.DataFrame(prep_array(Strength_info, max_len), columns=['Strength_ROI_index', 'Strength_Val'])
+df2 = pd.DataFrame(prep_array(Betweenness_info, max_len), columns=['Betweenness_ROI_index', 'Betweenness_Val'])
+df3 = pd.DataFrame(prep_array(Eigenvector_info, max_len), columns=['Eigenvector_ROI_index', 'Eigenvector_Val'])
+df4 = pd.DataFrame(prep_array(Clustering_info, max_len), columns=['Clustering_ROI_index', 'Clustering_Val'])
+# Concatenate the DataFrames horizontally (axis=1)
+df_combined = pd.concat([df1, df2, df3, df4], axis=1)
+
+df_combined.to_excel(output, index=False)
