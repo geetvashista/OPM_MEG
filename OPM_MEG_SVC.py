@@ -95,3 +95,22 @@ x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2)
 model = make_pipeline(SVC(C=0.1))
 model.fit(x_train, y_train)
 model.score(x_test, y_test)
+
+def update():
+    # Building and testing SVM
+    model = make_pipeline(SVC(C=0.1, kernel='rbf'))
+    
+    start = time.time()
+    results = []
+    for i in range(78):
+        model.fit(x_train[:, 3, :, i], y_train)
+        results.append(model.score(x_test[:, 3, :, i], y_test))
+    results = np.array(results)
+    print('\n' + "FEATURE EXECUTION TIME: " + str(time.time() - start) + " sec")
+    
+    areas = []
+    for indx, val in enumerate(results):
+        if val >= 0.52:
+            areas.append(indx)
+    model.fit(x_train[:, 3, 0, np.array(areas)], y_train)
+    model.score(x_test[:, 3, 0, np.array(areas)], y_test)
