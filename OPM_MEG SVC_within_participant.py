@@ -61,18 +61,20 @@ def feature_extraction(r1, r2):
     return np.array(r1_array), np.array(r2_array)
 
 par_result = []
+par_areas = []
 start = time.time()
 model = make_pipeline(SVC(C=0.1))
-metric = 0
+band = 1    # Pick a target band ([theta, alpha, beta, gamma], across axis one)
+metric = 1  # 0: strength, 1: betweenness, 2:eignvec, 3:clustering
 for i in range(10):
     # Load data
     print('Now running participant: ' + str(i))
-    r1 = np.load(r'C:\Users\em17531\Desktop\OPM_MEG\data\Windows_1\Windowed_1.npy')
-    r2 = np.load(r'C:\Users\em17531\Desktop\OPM_MEG\data\Windows_2\Windowed_2.npy')
+    r1 = np.load(r'/home/sahib/Documents/OPM_MEG/data/Windows_1/Windowed_run_1.npy')
+    r2 = np.load(r'/home/sahib/Documents/OPM_MEG/data/Windows_2/Windowed_run_2.npy')
 
     # Pick a target band ([theta, alpha, beta, gamma], across axis one)
-    r1 = r1[1, :, :, :, :]
-    r2 = r2[1, :, :, :, :]
+    r1 = r1[band, :, :, :, :]
+    r2 = r2[band, :, :, :, :]
     r1 = r1[i, :, :, :]
     r2 = r2[i, :, :, :]
 
@@ -95,11 +97,15 @@ for i in range(10):
 
     areas = []
     for indx, val in enumerate(results):
-        if val >= 0.52:
+        if val >= 0.53:
             areas.append(indx)
     model.fit(x_train[:, metric, 0, np.array(areas)], y_train)
     par_result.append(model.score(x_test[:, metric, 0, np.array(areas)], y_test))
+    par_areas.append(areas)
 
-array = np.array(par_result)
-print(array)
+array_results = np.array(par_result)
+print(array_results)
+max_lg = [len(i) for i in par_areas]
+pad = [lst + [np.nan]*(max(max_lg) - len(lst)) for lst in par_areas]
+array_areas = np.array(pad)
 print('\n' + "FINAL EXECUTION TIME: " + str(time.time() - start) + " sec")
