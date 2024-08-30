@@ -59,53 +59,208 @@ def feature_extraction(r1, r2):
     # print('\n' + "FEATURE EXECUTION TIME: " + str(time.time() - start) + " sec")
     print('\n')
     return np.array(r1_array), np.array(r2_array)
-
-par_result = []
-par_areas = []
-start = time.time()
 model = make_pipeline(SVC(C=0.1))
-band = 1    # Pick a target band ([theta, alpha, beta, gamma], across axis one)
-metric = 1  # 0: strength, 1: betweenness, 2:eignvec, 3:clustering
-for i in range(10):
-    # Load data
-    print('Now running participant: ' + str(i))
-    r1 = np.load(r'/home/sahib/Documents/OPM_MEG/data/Windows_1/Windowed_run_1.npy')
-    r2 = np.load(r'/home/sahib/Documents/OPM_MEG/data/Windows_2/Windowed_run_2.npy')
+output = '/home/sahib/Documents/OPM_MEG/Results/'
+start = time.time()
+band_names = ['Theta', 'Alpha', 'Beta', 'Gamma' ]
+band = 2
 
-    # Pick a target band ([theta, alpha, beta, gamma], across axis one)
-    r1 = r1[band, :, :, :, :]
-    r2 = r2[band, :, :, :, :]
-    r1 = r1[i, :, :, :]
-    r2 = r2[i, :, :, :]
+for k in range(4):
+    print('Running ' + str(band_names[k]) + ' band' + '\n')
+    # Strength
+    par_result = []
+    par_areas = []
+    metric = 0  # 0: strength, 1: betweenness, 2:eignvec, 3:clustering
+    for i in range(10):
+        # Load data
+        print('Now running participant: ' + str(i))
+        r1 = np.load(r'/home/sahib/Documents/OPM_MEG/data/Windows_1/Windowed_run_1.npy')
+        r2 = np.load(r'/home/sahib/Documents/OPM_MEG/data/Windows_2/Windowed_run_2.npy')
 
-    # Extract features
-    run_1_featurs, run_2_featurs = feature_extraction(r1, r2)
+        # Pick a target band ([theta, alpha, beta, gamma], across axis one)
+        r1 = r1[band, :, :, :, :]
+        r2 = r2[band, :, :, :, :]
+        r1 = r1[i, :, :, :]
+        r2 = r2[i, :, :, :]
 
-    # Join the arrays
-    x = np.concatenate((run_1_featurs, run_2_featurs), axis=0)
+        # Extract features
+        run_1_featurs, run_2_featurs = feature_extraction(r1, r2)
 
-    half_len = len(x)//2
-    y = [0] * half_len + [1] * half_len
+        # Join the arrays
+        x = np.concatenate((run_1_featurs, run_2_featurs), axis=0)
 
-    # Split data
-    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2)
-    results = []
-    for k in range(78):
-        model.fit(x_train[:, metric, :, k], y_train)
-        results.append(model.score(x_test[:, metric, :, k], y_test))
-    results = np.array(results)
+        half_len = len(x)//2
+        y = [0] * half_len + [1] * half_len
 
-    areas = []
-    for indx, val in enumerate(results):
-        if val >= 0.53:
-            areas.append(indx)
-    model.fit(x_train[:, metric, 0, np.array(areas)], y_train)
-    par_result.append(model.score(x_test[:, metric, 0, np.array(areas)], y_test))
-    par_areas.append(areas)
+        # Split data
+        x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2)
+        results = []
+        for k in range(78):
+            model.fit(x_train[:, metric, :, k], y_train)
+            results.append(model.score(x_test[:, metric, :, k], y_test))
+        results = np.array(results)
 
-array_results = np.array(par_result)
-print(array_results)
-max_lg = [len(i) for i in par_areas]
-pad = [lst + [np.nan]*(max(max_lg) - len(lst)) for lst in par_areas]
-array_areas = np.array(pad)
+        areas = []
+        for indx, val in enumerate(results):
+            if val >= 0.53:
+                areas.append(indx)
+        model.fit(x_train[:, metric, 0, np.array(areas)], y_train)
+        par_result.append(model.score(x_test[:, metric, 0, np.array(areas)], y_test))
+        par_areas.append(areas)
+
+    array_results = np.array(par_result)
+    print(array_results)
+    np.save(output + 'Strength__results_band_' + str(band), array_results)
+    max_lg = [len(i) for i in par_areas]
+    pad = [lst + [np.nan]*(max(max_lg) - len(lst)) for lst in par_areas]
+    array_areas = np.array(pad)
+    np.save(output + 'Strength_areas_band_' + str(band), array_results)
+
+    # Betweenness
+    par_result = []
+    par_areas = []
+    metric = 1  # 0: strength, 1: betweenness, 2:eignvec, 3:clustering
+    for i in range(10):
+        # Load data
+        print('Now running participant: ' + str(i))
+        r1 = np.load(r'/home/sahib/Documents/OPM_MEG/data/Windows_1/Windowed_run_1.npy')
+        r2 = np.load(r'/home/sahib/Documents/OPM_MEG/data/Windows_2/Windowed_run_2.npy')
+
+        # Pick a target band ([theta, alpha, beta, gamma], across axis one)
+        r1 = r1[band, :, :, :, :]
+        r2 = r2[band, :, :, :, :]
+        r1 = r1[i, :, :, :]
+        r2 = r2[i, :, :, :]
+
+        # Extract features
+        run_1_featurs, run_2_featurs = feature_extraction(r1, r2)
+
+        # Join the arrays
+        x = np.concatenate((run_1_featurs, run_2_featurs), axis=0)
+
+        half_len = len(x)//2
+        y = [0] * half_len + [1] * half_len
+
+        # Split data
+        x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2)
+        results = []
+        for k in range(78):
+            model.fit(x_train[:, metric, :, k], y_train)
+            results.append(model.score(x_test[:, metric, :, k], y_test))
+        results = np.array(results)
+
+        areas = []
+        for indx, val in enumerate(results):
+            if val >= 0.525:
+                areas.append(indx)
+        model.fit(x_train[:, metric, 0, np.array(areas)], y_train)
+        par_result.append(model.score(x_test[:, metric, 0, np.array(areas)], y_test))
+        par_areas.append(areas)
+
+    array_results = np.array(par_result)
+    print(array_results)
+    np.save(output + 'betweenness__results_band_' + str(band), array_results)
+    max_lg = [len(i) for i in par_areas]
+    pad = [lst + [np.nan]*(max(max_lg) - len(lst)) for lst in par_areas]
+    array_areas = np.array(pad)
+    np.save(output + 'betweenness_areas_band_' + str(band), array_results)
+
+    # Eginvec
+    par_result = []
+    par_areas = []
+    metric = 2  # 0: strength, 1: betweenness, 2:eignvec, 3:clustering
+    for i in range(10):
+        # Load data
+        print('Now running participant: ' + str(i))
+        r1 = np.load(r'/home/sahib/Documents/OPM_MEG/data/Windows_1/Windowed_run_1.npy')
+        r2 = np.load(r'/home/sahib/Documents/OPM_MEG/data/Windows_2/Windowed_run_2.npy')
+
+        # Pick a target band ([theta, alpha, beta, gamma], across axis one)
+        r1 = r1[band, :, :, :, :]
+        r2 = r2[band, :, :, :, :]
+        r1 = r1[i, :, :, :]
+        r2 = r2[i, :, :, :]
+
+        # Extract features
+        run_1_featurs, run_2_featurs = feature_extraction(r1, r2)
+
+        # Join the arrays
+        x = np.concatenate((run_1_featurs, run_2_featurs), axis=0)
+
+        half_len = len(x)//2
+        y = [0] * half_len + [1] * half_len
+
+        # Split data
+        x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2)
+        results = []
+        for k in range(78):
+            model.fit(x_train[:, metric, :, k], y_train)
+            results.append(model.score(x_test[:, metric, :, k], y_test))
+        results = np.array(results)
+
+        areas = []
+        for indx, val in enumerate(results):
+            if val >= 0.53:
+                areas.append(indx)
+        model.fit(x_train[:, metric, 0, np.array(areas)], y_train)
+        par_result.append(model.score(x_test[:, metric, 0, np.array(areas)], y_test))
+        par_areas.append(areas)
+
+    array_results = np.array(par_result)
+    print(array_results)
+    np.save(output + 'eignvec__results_band_' + str(band), array_results)
+    max_lg = [len(i) for i in par_areas]
+    pad = [lst + [np.nan]*(max(max_lg) - len(lst)) for lst in par_areas]
+    array_areas = np.array(pad)
+    np.save(output + 'eignvec_areas_band_' + str(band), array_results)
+
+    # Clustering
+    par_result = []
+    par_areas = []
+    metric = 3  # 0: strength, 1: betweenness, 2:eignvec, 3:clustering
+    for i in range(10):
+        # Load data
+        print('Now running participant: ' + str(i))
+        r1 = np.load(r'/home/sahib/Documents/OPM_MEG/data/Windows_1/Windowed_run_1.npy')
+        r2 = np.load(r'/home/sahib/Documents/OPM_MEG/data/Windows_2/Windowed_run_2.npy')
+
+        # Pick a target band ([theta, alpha, beta, gamma], across axis one)
+        r1 = r1[band, :, :, :, :]
+        r2 = r2[band, :, :, :, :]
+        r1 = r1[i, :, :, :]
+        r2 = r2[i, :, :, :]
+
+        # Extract features
+        run_1_featurs, run_2_featurs = feature_extraction(r1, r2)
+
+        # Join the arrays
+        x = np.concatenate((run_1_featurs, run_2_featurs), axis=0)
+
+        half_len = len(x)//2
+        y = [0] * half_len + [1] * half_len
+
+        # Split data
+        x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2)
+        results = []
+        for k in range(78):
+            model.fit(x_train[:, metric, :, k], y_train)
+            results.append(model.score(x_test[:, metric, :, k], y_test))
+        results = np.array(results)
+
+        areas = []
+        for indx, val in enumerate(results):
+            if val >= 0.53:
+                areas.append(indx)
+        model.fit(x_train[:, metric, 0, np.array(areas)], y_train)
+        par_result.append(model.score(x_test[:, metric, 0, np.array(areas)], y_test))
+        par_areas.append(areas)
+
+    array_results = np.array(par_result)
+    print(array_results)
+    np.save(output + 'clustering__results_band_' + str(band), array_results)
+    max_lg = [len(i) for i in par_areas]
+    pad = [lst + [np.nan]*(max(max_lg) - len(lst)) for lst in par_areas]
+    array_areas = np.array(pad)
+    np.save(output + 'clustering_areas_band_' + str(band), array_results)
+
 print('\n' + "FINAL EXECUTION TIME: " + str(time.time() - start) + " sec")
