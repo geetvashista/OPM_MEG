@@ -186,9 +186,8 @@ import time
 start = time.time()
 
 # Data pathing and loading
-r1 = np.load(r'C:\Users\em17531\Desktop\OPM_MEG\data\Windows_1\Windowed_1.npy')
-r2 = np.load(r'C:\Users\em17531\Desktop\OPM_MEG\data\Windows_2\Windowed_2.npy')
-
+r1 = np.load(r'/home/sahib/Documents/OPM_MEG/data/Windows_1/Windowed_run_1.npy')
+r2 = np.load(r'/home/sahib/Documents/OPM_MEG/data/Windows_2/Windowed_run_2.npy')
 # Graph calculator function
 def graph_metrics(adj_matrix):  # TODO: Add in stats, maybe nbs? Could use fdc as well?
     # Strength calculator
@@ -220,10 +219,9 @@ def graph_metrics(adj_matrix):  # TODO: Add in stats, maybe nbs? Could use fdc a
 # feature extraction function
 def apply_graph_metrics(r1, r2):
     r1_array = []
-    hold = []
-    for sample in r1:
+    for sample_r1 in r1:
         features = []
-        r1_S, r1_B, r1_E, r1_C = graph_metrics(sample)
+        r1_S, r1_B, r1_E, r1_C = graph_metrics(sample_r1)
         features.append(r1_S)
         features.append(r1_B)
         features.append(r1_E)
@@ -232,17 +230,16 @@ def apply_graph_metrics(r1, r2):
         r1_array.append(sample_features)
 
     r2_array = []
-    for sample in r2:
+    for sample_r2 in r2:
         features = []
-        r2_S, r2_B, r2_E, r2_C = graph_metrics(sample)
+        r2_S, r2_B, r2_E, r2_C = graph_metrics(sample_r2)
         features.append(r2_S)
         features.append(r2_B)
         features.append(r2_E)
         features.append(r2_C)
         sample_features = np.array(features)
         r2_array.append(sample_features)
-        hold.append(sample)
-    print('Participant ' + str(len(hold)) + ' feature extraction complete')
+    print('Participant feature extraction complete')
     return np.array(r1_array), np.array(r2_array)
 
 
@@ -268,7 +265,7 @@ def feature_extraction(band, r1, r2):
         del input_2
 
     r1_array = np.array(all_participants_r1)
-    r2_array = np.array(all_participants_r1)
+    r2_array = np.array(all_participants_r2)
 
     participant_features_r1 = []
     participant_features_r2 = []
@@ -286,4 +283,8 @@ def feature_extraction(band, r1, r2):
 # Testing
 feature_extraction(0, r1, r2)
 print('\n' + "FINAL EXECUTION TIME: " + str(time.time() - start) + " sec")
+
+# Load files back in
+test_r1 = np.load('/home/sahib/PycharmProjects/General_work/Theta_r1_feature_array.npy')
+test_r2 = np.load('/home/sahib/PycharmProjects/General_work/Theta_r2_feature_array.npy')
 
