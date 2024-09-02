@@ -170,3 +170,120 @@ np.save('Beta_r1_feature_array', thata_r1_feature_array)
 np.save('Beta_r2_feature_array', thata_r2_feature_array)
 
 print('\n' + "FINAL EXECUTION TIME: " + str(time.time() - start) + " sec")
+
+
+
+
+
+
+
+
+
+
+import numpy as np
+import bct
+import time
+start = time.time()
+
+# Data pathing and loading
+r1 = np.load(r'C:\Users\em17531\Desktop\OPM_MEG\data\Windows_1\Windowed_1.npy')
+r2 = np.load(r'C:\Users\em17531\Desktop\OPM_MEG\data\Windows_2\Windowed_2.npy')
+
+# Graph calculator function
+def graph_metrics(adj_matrix):  # TODO: Add in stats, maybe nbs? Could use fdc as well?
+    # Strength calculator
+    strength = []
+    strength.append(bct.strengths_und(np.nan_to_num(adj_matrix)))
+    strength = np.array(strength)
+
+    # Zeroing negative phasing
+    strength[strength < 0] = 0
+
+    # Betweenness centrality calculator
+    betweenness = []
+    betweenness.append(bct.betweenness_wei(np.nan_to_num(adj_matrix)))
+    betweenness = np.array(betweenness)
+
+    # Eigenvector centrality calculator
+    eigenvector = []
+    eigenvector.append(bct.eigenvector_centrality_und(np.nan_to_num(adj_matrix)))
+    eigenvector = np.array(eigenvector)
+
+    # Clustering calculator
+    clustering = []
+    clustering.append(bct.clustering_coef_wu(np.nan_to_num(adj_matrix)))
+    clustering = np.array(clustering)
+
+    return strength, betweenness, eigenvector, clustering
+
+
+# feature extraction function
+def apply_graph_metrics(r1, r2):
+    r1_array = []
+    hold = []
+    for sample in r1:
+        features = []
+        r1_S, r1_B, r1_E, r1_C = graph_metrics(sample)
+        features.append(r1_S)
+        features.append(r1_B)
+        features.append(r1_E)
+        features.append(r1_C)
+        sample_features = np.array(features)
+        r1_array.append(sample_features)
+
+    r2_array = []
+    for sample in r2:
+        features = []
+        r2_S, r2_B, r2_E, r2_C = graph_metrics(sample)
+        features.append(r2_S)
+        features.append(r2_B)
+        features.append(r2_E)
+        features.append(r2_C)
+        sample_features = np.array(features)
+        r2_array.append(sample_features)
+        hold.append(sample)
+    print('Participant ' + str(len(hold)) + ' feature extraction complete')
+    return np.array(r1_array), np.array(r2_array)
+
+
+# Get band and metric data
+def data_extraction(r1, r2, band, participant):
+    r1 = r1[band, :, :, :, :]
+    r2 = r2[band, :, :, :, :]
+    r1 = r1[participant, :, :, :]
+    r2 = r2[participant, :, :, :]
+    return r1, r2
+
+
+def feature_extraction(band, r1, r2):
+    band = band
+    bands = ['Theta', 'Alpha', 'Beta', 'Gamma']
+    all_participants_r1 = []
+    all_participants_r2 = []
+    for participant in range(10):
+        input_1, input_2 = data_extraction(r1, r2, band=band, participant=participant)
+        all_participants_r1.append(input_1)
+        all_participants_r2.append(input_2)
+        del input_1
+        del input_2
+
+    r1_array = np.array(all_participants_r1)
+    r2_array = np.array(all_participants_r1)
+
+    participant_features_r1 = []
+    participant_features_r2 = []
+    for i in range(10):
+        pf1, pf2 = apply_graph_metrics(r1_array[i, :, :, :], r2_array[i, :, :, :])
+        participant_features_r1.append(pf1)
+        participant_features_r2.append(pf2)
+
+    r1_feature_array = np.array(participant_features_r1)
+    r2_feature_array = np.array(participant_features_r2)
+
+    np.save(bands[band] + '_r1_feature_array', r1_feature_array)
+    np.save(bands[band] + '_r2_feature_array', r2_feature_array)
+
+# Testing
+feature_extraction(0, r1, r2)
+print('\n' + "FINAL EXECUTION TIME: " + str(time.time() - start) + " sec")
+
