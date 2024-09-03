@@ -34,4 +34,7 @@ for i in range(10):
     model.fit(x_train[:, 1, 0, np.array(areas)], y_train)
     scores.append(model.score(x_test[:, 1, 0, np.array(areas)], y_test))
 [print(k) for k in scores]
-print('\n' + "FEATURE EXECUTION TIME: " + str(time.time() - start) + " sec")
+print('\n' + "EXECUTION TIME: " + str(time.time() - start) + " sec")
+
+# temp_array = np.array(scores[1:9])
+# temp_array.mean()
