@@ -37,4 +37,4 @@ for i in range(10):
 print('\n' + "EXECUTION TIME: " + str(time.time() - start) + " sec")
 
 # temp_array = np.array(scores[1:9])
-# temp_array.mean()
+# print('\n' + 'Mean without participant 1: ' + str(temp_array.mean()))
