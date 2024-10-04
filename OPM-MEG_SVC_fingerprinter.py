@@ -6,24 +6,21 @@ import time
 from scipy import stats
 start = time.time()
 
-# Load data
-r1 = np.load(r'C:\Users\em17531\Desktop\OPM_MEG\data\Windowed_features\Alpha_r1_feature_array.npy')
-r2 = np.load(r'C:\Users\em17531\Desktop\OPM_MEG\data\Windowed_features\Alpha_r2_feature_array.npy')
-
 # del possible bad data participant
 # r1 = np.delete(r1, 0, 0)
 # r2 = np.delete(r2, 0, 0)
 
-# flatten out participants
-r1 = r1.reshape((2727 + 303), 4, 1, 78)
-r2 = r2.reshape((2727 + 303), 4, 1, 78)
+permutations = 10    # This is the only think that really needs to be changed. default is (10)
 
 model = make_pipeline(SVC(C=0.1, kernel='rbf'))
 hold = []
 
-def fun(r1, r2, model):
+def fun(r1, r2, model, permutations):
+    # flatten out participants
+    r1 = r1.reshape((2727 + 303), 4, 1, 78)
+    r2 = r2.reshape((2727 + 303), 4, 1, 78)
     hold = []
-    for run in range(10):
+    for run in range(permutations):
         r1 = stats.zscore(r1, axis=-1)
         r2 = stats.zscore(r2, axis=-1)
         # x = np.concatenate((r1, r2), axis=0)
@@ -59,11 +56,10 @@ def fun(r1, r2, model):
         hold.append(score)
     arr_1 = np.array(hold)
 
-    # print('\n' + 'Mean result: ' + str(arr.mean()))
-    print('\n' + "EXECUTION TIME: " + str(time.time() - start) + " sec")
+    print('Run complete')
 
     hold = []
-    for run in range(10):
+    for run in range(permutations):
         r1 = stats.zscore(r1, axis=-1)
         r2 = stats.zscore(r2, axis=-1)
         # x = np.concatenate((r1, r2), axis=0)
@@ -100,14 +96,31 @@ def fun(r1, r2, model):
     arr_2 = np.array(hold)
 
     # print('\n' + 'Mean result: ' + str(arr_2.mean()))
-    print('\n' + "EXECUTION TIME: " + str(time.time() - start) + " sec")
+    print('Run complete')
+    print('\n' + ' -- Band complete -- ' + '\n')
     return arr_1, arr_2
 
 # Call
-A_arr_1, A_arr_2 = fun(r1=r1, r2=r2, model=model)
 
+    # Theta
+r1 = np.load(r'C:\Users\em17531\Desktop\OPM_MEG\data\Windowed_features\Theta_r1_feature_array.npy')
+r2 = np.load(r'C:\Users\em17531\Desktop\OPM_MEG\data\Windowed_features\Theta_r2_feature_array.npy')
+t_arr_1, t_arr_2 = fun(r1=r1, r2=r2, model=model, permutations=permutations)
 
+    # Alpha
+r1 = np.load(r'C:\Users\em17531\Desktop\OPM_MEG\data\Windowed_features\Alpha_r1_feature_array.npy')
+r2 = np.load(r'C:\Users\em17531\Desktop\OPM_MEG\data\Windowed_features\Alpha_r2_feature_array.npy')
+a_arr_1, a_arr_2 = fun(r1=r1, r2=r2, model=model, permutations=permutations)
 
+    # Beta
+r1 = np.load(r'C:\Users\em17531\Desktop\OPM_MEG\data\Windowed_features\Beta_r1_feature_array.npy')
+r2 = np.load(r'C:\Users\em17531\Desktop\OPM_MEG\data\Windowed_features\Beta_r2_feature_array.npy')
+b_arr_1, b_arr_2 = fun(r1=r1, r2=r2, model=model, permutations=permutations)
+
+    # Gamma
+r1 = np.load(r'C:\Users\em17531\Desktop\OPM_MEG\data\Windowed_features\Gamma_r1_feature_array.npy')
+r2 = np.load(r'C:\Users\em17531\Desktop\OPM_MEG\data\Windowed_features\Gamma_r2_feature_array.npy')
+g_arr_1, g_arr_2 = fun(r1=r1, r2=r2, model=model, permutations=permutations)
 
     ### Plotting ###
 
@@ -117,12 +130,14 @@ import seaborn as sns
 matplotlib.use('Qt5Agg')
 
 
-runs = [1] * 10 + [2] * 10
+runs = [1] * permutations + [2] * permutations
 
 
-bands = ['Theta'] * 20 + ['Alpha'] * 20
-accuracy = (list(arr_1) + list(arr_2)) + (list(A_arr_1) + list(A_arr_2))
+bands = ['Theta'] * (permutations * 2) + ['Alpha'] * (permutations * 2)
+accuracy = (list(t_arr_1) + list(t_arr_2)) + (list(a_arr_1) + list(a_arr_2) + (list(b_arr_1) + list(b_arr_2) + (list(g_arr_1) + list(g_arr_2))
 
-df = pd.DataFrame({'accuracy': accuracy, 'bands': bands, 'runs': (runs + runs)})
+df = pd.DataFrame({'accuracy': accuracy, 'bands': bands, 'runs': (runs + runs + runs + runs)})
+
+print('\n' + "EXECUTION TIME: " + str(time.time() - start) + " sec")
 
 sns.boxplot(data=df, x='bands', y='accuracy', hue="runs", width=.5)
