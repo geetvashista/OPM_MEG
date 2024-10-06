@@ -135,4 +135,7 @@ df = pd.DataFrame({'accuracy': accuracy, 'bands': bands, 'runs': (runs + runs + 
 
 print('\n' + "EXECUTION TIME: " + str(time.time() - start) + " sec")
 
-sns.boxplot(data=df, x='bands', y='accuracy', hue="runs", width=.5)
+fig_box = sns.boxplot(data=df, x='bands', y='accuracy', hue="runs", width=.5, palette="light:#5A9")
+fig_viol = sns.violinplot(data=df, x='bands', y='accuracy', hue="runs", palette="light:#5A9", split=True)
+fig_box.set_title('Fingerprinting accuracy boxplot')
+fig_viol.set_title('Fingerprinting accuracy violin plot')
