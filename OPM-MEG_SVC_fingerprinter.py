@@ -3,12 +3,9 @@ from sklearn.pipeline import make_pipeline
 from sklearn.svm import SVC
 from sklearn.model_selection import train_test_split
 import time
+import pandas as pd
 from scipy import stats
 start = time.time()
-
-# del possible bad data participant
-# r1 = np.delete(r1, 0, 0)
-# r2 = np.delete(r2, 0, 0)
 
 permutations = 10    # This is the only think that really needs to be changed. default is (10)
 
@@ -123,8 +120,6 @@ r2 = np.load(r'C:\Users\em17531\Desktop\OPM_MEG\data\Windowed_features\Gamma_r2_
 g_arr_1, g_arr_2 = fun(r1=r1, r2=r2, model=model, permutations=permutations)
 
     ### Plotting ###
-
-import pandas as pd
 import matplotlib
 import seaborn as sns
 matplotlib.use('Qt5Agg')
@@ -134,7 +129,7 @@ runs = [1] * permutations + [2] * permutations
 
 
 bands = ['Theta'] * (permutations * 2) + ['Alpha'] * (permutations * 2)
-accuracy = (list(t_arr_1) + list(t_arr_2)) + (list(a_arr_1) + list(a_arr_2) + (list(b_arr_1) + list(b_arr_2) + (list(g_arr_1) + list(g_arr_2))
+accuracy = (list(t_arr_1) + list(t_arr_2)) + (list(a_arr_1) + list(a_arr_2)) + (list(b_arr_1) + list(b_arr_2)) + (list(g_arr_1) + list(g_arr_2))
 
 df = pd.DataFrame({'accuracy': accuracy, 'bands': bands, 'runs': (runs + runs + runs + runs)})
 
