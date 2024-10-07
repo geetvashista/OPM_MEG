@@ -88,3 +88,54 @@ plt.xticks(())
 plt.yticks(())
 print('\n' + "FEATURE EXECUTION TIME: " + str(time.time() - start) + " sec")
 plt.show()
+
+
+
+
+
+# NEW #
+_, ax = plt.subplots(figsize=(4, 3))
+x_min, x_max, y_min, y_max = temp_train[:, 0].min(), temp_train[:, 0].max(), temp_train[:, 1].min(), temp_train[:, 1].max()
+ax.set(xlim=(x_min, x_max), ylim=(y_min, y_max))
+
+# Plot decision boundary and margins
+common_params = {"estimator": model, "X": temp_train, "ax": ax}
+DecisionBoundaryDisplay.from_estimator(
+    **common_params,
+    response_method="predict",
+    plot_method="pcolormesh",
+    alpha=0.3,
+)
+DecisionBoundaryDisplay.from_estimator(
+    **common_params,
+    response_method="decision_function",
+    plot_method="contour",
+    levels=[-1, 0, 1],
+    colors=["k", "k", "k"],
+    linestyles=["--", "-", "--"],
+)
+
+ax.scatter(temp_train[:, 0], temp_train[:, 1])
+plt.show()
+
+
+x_min, x_max = temp_train_1[:, 0].min() - 1, temp_train_1[:, 0].max() + 1
+y_min, y_max = temp_train_1[:, 1].min() - 1, temp_train_1[:, 1].max() + 1
+xx, yy = np.meshgrid(np.arange(x_min, x_max, h),
+                     np.arange(y_min, y_max, h))
+
+Z = model.predict(np.c_[xx.ravel(), yy.ravel()])
+
+# Put the result into a color plot
+Z = Z.reshape(xx.shape)
+plt.contourf(xx, yy, Z, cmap=plt.cm.coolwarm, alpha=0.8)
+
+plt.scatter(temp_train_1[:, 0], temp_train_1[:, 1], c=y_train, cmap=plt.cm.coolwarm)
+plt.xlabel('feature_x')
+plt.ylabel('feature_y')
+plt.xlim(xx.min(), xx.max())
+plt.ylim(yy.min(), yy.max())
+plt.xticks(())
+plt.yticks(())
+print('\n' + "FEATURE EXECUTION TIME: " + str(time.time() - start) + " sec")
+plt.show()
