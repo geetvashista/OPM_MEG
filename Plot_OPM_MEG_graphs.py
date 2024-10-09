@@ -78,8 +78,8 @@ netplotbrain.plot(nodes=nodes,
                   node_color='community',
                   title='Theta',
                   arrowaxis=None,
-                  highlight_level=0.95,
-                  node_scale=20)
+                  highlight_level=0.8,
+                  node_scale=100)
 
 # import seaborn as sns
 # r1 = np.load(r'C:\Users\em17531\Desktop\OPM_MEG\derivatives\Full_band\Full_band_run_2\master_adj_matrix_Full_band_run_2.npy')
