@@ -1,5 +1,5 @@
 import numpy as np
-import pandas as pd
+from sklearn.inspection import DecisionBoundaryDisplay
 from sklearn.pipeline import make_pipeline
 from sklearn.svm import SVC
 from sklearn.model_selection import train_test_split
@@ -64,36 +64,10 @@ print(model.score(temp_test, y_test))
 h = .02
 
 # For mamory perpaces, del the first windows
-ls = []
-[ls.append(i) for i in range(400)]
-temp_train_1 = np.delete(temp_train, axis=0, obj=ls)
+# ls = []
+# [ls.append(i) for i in range(400)]
+# temp_train_1 = np.delete(temp_train, axis=0, obj=ls)
 
-x_min, x_max = temp_train_1[:, 0].min() - 1, temp_train_1[:, 0].max() + 1
-y_min, y_max = temp_train_1[:, 1].min() - 1, temp_train_1[:, 1].max() + 1
-xx, yy = np.meshgrid(np.arange(x_min, x_max, h),
-                     np.arange(y_min, y_max, h))
-
-Z = model.predict(np.c_[xx.ravel(), yy.ravel()])
-
-# Put the result into a color plot
-Z = Z.reshape(xx.shape)
-plt.contourf(xx, yy, Z, cmap=plt.cm.coolwarm, alpha=0.8)
-
-plt.scatter(temp_train_1[:, 0], temp_train_1[:, 1], c=y_train, cmap=plt.cm.coolwarm)
-plt.xlabel('feature_x')
-plt.ylabel('feature_y')
-plt.xlim(xx.min(), xx.max())
-plt.ylim(yy.min(), yy.max())
-plt.xticks(())
-plt.yticks(())
-print('\n' + "FEATURE EXECUTION TIME: " + str(time.time() - start) + " sec")
-plt.show()
-
-
-
-
-
-# NEW #
 _, ax = plt.subplots(figsize=(4, 3))
 x_min, x_max, y_min, y_max = temp_train[:, 0].min(), temp_train[:, 0].max(), temp_train[:, 1].min(), temp_train[:, 1].max()
 ax.set(xlim=(x_min, x_max), ylim=(y_min, y_max))
@@ -115,7 +89,7 @@ DecisionBoundaryDisplay.from_estimator(
     linestyles=["--", "-", "--"],
 )
 
-ax.scatter(temp_train[:, 0], temp_train[:, 1])
+ax.scatter(temp_train[:, 0], temp_train[:, 1], c=y_train)
 plt.show()
 
 
