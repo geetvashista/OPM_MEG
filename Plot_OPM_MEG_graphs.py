@@ -11,47 +11,48 @@ import scipy
 import matplotlib
 
 # Setting some backend perameters
-# matplotlib.use('TkAgg')
+matplotlib.use('TkAgg')
+
 
 com = []
 for i in range(78):
-    com.append(0)
+    com.append('No sig')
 
 # # Strength
 stg = [4, 19, 20, 22, 74]
 for i, val in enumerate(com):
     for k in stg:
         if i == k:
-            com[i] = 1
+            com[i] = 'Strength'
 #
 # Betweeness
 stg = [59]
 for i, val in enumerate(com):
     for k in stg:
         if i == k:
-            com[i] = 2
+            com[i] = 'Betweenness'
 
 # Eignvec
 stg = [7, 17, 28, 30, 38, 46, 68, 69]
 for i, val in enumerate(com):
     for k in stg:
         if i == k:
-            com[i] = 3
+            com[i] = 'Eigenvec'
 #
 # Clustering
-stg = [0, 12, 13, 16, 38, 75]
+stg = [0, 12, 3, 16, 38, 75]
 for i, val in enumerate(com):
     for k in stg:
         if i == k:
-            com[i] = 4
+            com[i] = 'Clustering'
 
 
 
 # Set depanneurs
 mat_voxlox = scipy.io.loadmat(r'C:\Users\em17531\Desktop\Atlas\OPM_atlas_xyz.mat')
-r1 = np.load(r'C:\Users\em17531\Desktop\OPM_MEG\derivatives\Theta\run_1\Master_adj_matrix__Theda_run-001.npy')
+r1 = np.load(r'C:\Users\em17531\Desktop\OPM_MEG\derivatives\Theta\run_1\Master_adj_matrix__Theta_run-001.npy')
 r1 = np.mean(r1, axis=0)
-r2 = np.load(r'C:\Users\em17531\Desktop\OPM_MEG\derivatives\Theta\run_2\Master_adj_matrix__Theda_run-002.npy')
+r2 = np.load(r'C:\Users\em17531\Desktop\OPM_MEG\derivatives\Theta\run_2\Master_adj_matrix__Theta_run-002.npy')
 r2 = np.mean(r2, axis=0)
 adj = r1 - r2
 hig = np.load(r'C:\Users\em17531\Desktop\OPM_MEG\derivatives\Theta\stats_Theta\nbs\_adj.npy')
@@ -77,8 +78,7 @@ netplotbrain.plot(nodes=nodes,
                   view=['LSR'],
                   node_color='community',
                   title='Theta',
-                  arrowaxis=None,
-                  highlight_level=0.8,
+                  highlight_level=1,
                   node_scale=100)
 
 # import seaborn as sns
