@@ -1,0 +1,52 @@
+import numpy as np
+import networkx as nx
+import bct
+import matplotlib
+import seaborn as sns
+import time
+
+# Setting some backend perameters
+matplotlib.use('TkAgg')
+
+r1 = np.load(r'C:\Users\em17531\Desktop\OPM_MEG\derivatives\Theta\run_1\Master_adj_matrix__Theta_run-001.npy')
+r1 = np.mean(r1, axis=0)
+remove_chans = [1, 2, 24, 28, 32, 33, 34, 45, 40, 41, 63, 67, 71, 72, 73, 74]
+r1 = np.delete(r1, remove_chans, axis=-1)
+r1 = np.delete(r1, remove_chans, axis=0)
+
+G = nx.from_numpy_array(r1)
+G.remove_edges_from(list(nx.selfloop_edges(G)))
+
+array = nx.to_numpy_array(G)
+org_array = array
+array[array <0.4] = 0
+
+# ran_net, _ = bct.null_model_und_sign(array)
+
+# start = time.time()
+# hold = []
+# for i in range(10):
+#     ran_net, _ = bct.null_model_und_sign(array, 10)
+#     hold.append(ran_net)
+# hold = np.array(hold)
+# print('Time: ' + str((time.time() - start)) + ' secs')
+
+ran_net, _ = bct.null_model_und_sign(array, 1000)
+ran_rich = bct.rich_club_wu(ran_net, klevel=100)
+result = bct.rich_club_wu(array, klevel=100)
+# ran_rich = np.nan_to_num(ran_rich, nan=1)
+# result = np.nan_to_num(result, nan=1)
+norm = result/ran_rich
+
+sns.lineplot(ran_rich)
+sns.lineplot(result)
+
+
+
+temp = []
+for row in array:
+    for i in row:
+        if i > 0:
+            temp.append(1)
+val = (len(temp)/(62*62))*100
+print(val, '% of edges retained')
