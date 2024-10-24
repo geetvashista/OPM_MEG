@@ -39,8 +39,6 @@ result = bct.rich_club_wu(array, klevel=100)
 # result = np.nan_to_num(result, nan=1)
 norm = result/ran_rich
 
-sns.lineplot(ran_rich)
-sns.lineplot(result)
 
 # Plotting
 df = pd.DataFrame({'Result' : result, 'Random' : ran_rich})
@@ -52,7 +50,8 @@ fig_norm = sns.lineplot(df_norm)
 fig_norm.set_title('Normalized Rich Club Curve')
 fig_norm.axhline(y=1, color='black', ls=':')
 
-
+# sns.lineplot(ran_rich)
+# sns.lineplot(result)
 
 temp = []
 for row in array:
