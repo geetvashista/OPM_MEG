@@ -39,6 +39,8 @@ result = bct.rich_club_wu(array, klevel=100)
 # result = np.nan_to_num(result, nan=1)
 norm = result/ran_rich
 
+sns.lineplot(ran_rich)
+sns.lineplot(result)
 
 # Plotting
 df = pd.DataFrame({'Result' : result, 'Random' : ran_rich})
@@ -50,8 +52,14 @@ fig_norm = sns.lineplot(df_norm)
 fig_norm.set_title('Normalized Rich Club Curve')
 fig_norm.axhline(y=1, color='black', ls=':')
 
-# sns.lineplot(ran_rich)
-# sns.lineplot(result)
+
+# Exploring core
+core, core_size = bct.score_wu(org_array, s=3.5)  # range seems to run from 0 to about 4
+sns.heatmap(core)
+
+# TODO: Participation in the rich club 
+
+# Extra
 
 temp = []
 for row in array:
