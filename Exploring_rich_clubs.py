@@ -3,6 +3,7 @@ import networkx as nx
 import bct
 import matplotlib
 import seaborn as sns
+import pandas as pd
 import time
 
 # Setting some backend perameters
@@ -19,7 +20,7 @@ G.remove_edges_from(list(nx.selfloop_edges(G)))
 
 array = nx.to_numpy_array(G)
 org_array = array
-array[array <0.4] = 0
+array[array <0.25] = 0
 
 # ran_net, _ = bct.null_model_und_sign(array)
 
@@ -31,7 +32,7 @@ array[array <0.4] = 0
 # hold = np.array(hold)
 # print('Time: ' + str((time.time() - start)) + ' secs')
 
-ran_net, _ = bct.null_model_und_sign(array, 1000)
+ran_net, _ = bct.null_model_und_sign(array, 100)
 ran_rich = bct.rich_club_wu(ran_net, klevel=100)
 result = bct.rich_club_wu(array, klevel=100)
 # ran_rich = np.nan_to_num(ran_rich, nan=1)
@@ -40,6 +41,16 @@ norm = result/ran_rich
 
 sns.lineplot(ran_rich)
 sns.lineplot(result)
+
+# Plotting
+df = pd.DataFrame({'Result' : result, 'Random' : ran_rich})
+fig = sns.lineplot(df)
+fig.set_title('Raw Rich Club Curve')
+
+df_norm = pd.DataFrame({'Normalized RC': norm})
+fig_norm = sns.lineplot(df_norm)
+fig_norm.set_title('Normalized Rich Club Curve')
+fig_norm.axhline(y=1, color='black', ls=':')
 
 
 
