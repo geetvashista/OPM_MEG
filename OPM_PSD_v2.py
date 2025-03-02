@@ -210,7 +210,7 @@ def get_mean_mne_psd(file_path, ax):
     return data.compute_psd(fmin=1, fmax=30, average='mean', ax=ax)
 
 
-def plot_mne(participant):
+def plot_mne(participant):    # TO DO: get this working, and add title adding ability
     # Get the data we need
     # run_1 = get_mean_mne_psd(r'C:\Users\em17531\Desktop\OPM_MEG\data\run_1\sub-00' + str(participant) + '_run-001_VE_1_40_Hz_Z'
     #                                                                                            '.mat_array.npy')
