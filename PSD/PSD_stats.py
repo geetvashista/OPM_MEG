@@ -152,3 +152,86 @@ for key, val in enumerate(p_vals):
 for i in sig_index:
     print(ROI_names[i])
 
+
+# Let make our run averages
+run_1_mean_areas = psd_run_1.mean(axis=-1).mean(0)
+run_2_mean_areas = psd_run_2.mean(axis=-1).mean(0)
+
+p_vals_for_df = []
+for i in sig_index:
+    p_vals_for_df.append(p_vals[i])
+
+
+def val_for_df(list_ob, sig_index):
+    roi_for_df = []
+    for i in sig_index:
+        roi_for_df.append(list_ob[i])
+    return np.array(roi_for_df)
+
+
+df = pd.DataFrame({'Area names': names_for_df,
+                   'P_vals': p_vals_for_df,
+                   'Run_1': val_for_df(run_1_mean_areas, sig_index),
+                   'Run_2': val_for_df(run_2_mean_areas, sig_index)})
+
+
+# Let's get participant level info
+
+run_1_with_participants = psd_run_1.mean(axis=-1)
+run_2_with_participants = psd_run_2.mean(axis=-1)
+
+
+def PSD_participant_vals(run_with_participants, sig_index):
+    hold = []
+    for i in sig_index:
+        hold.append(run_with_participants[i])
+    return hold
+
+all_run_1_participant_vals = []
+for i in range(10):
+    all_run_1_participant_vals.append(PSD_participant_vals(run_1_with_participants[i], sig_index))
+all_run_1_participant_vals = np.array(all_run_1_participant_vals)
+
+all_run_2_participant_vals = []
+for i in range(10):
+    all_run_2_participant_vals.append(PSD_participant_vals(run_2_with_participants[i], sig_index))
+all_run_2_participant_vals = np.array(all_run_2_participant_vals)
+
+
+def plot_individual_pie(area_index):
+
+    def get_ratio(run_1_array, run_2_array):
+        ratio = []
+        for i in range(10):
+            r1 = run_1_array[i]
+            r2 = run_2_array[i]
+            if r1 >= r2:
+                ratio.append(0)
+            else:
+                ratio.append(1)
+        return ratio
+
+
+    run_1_array = all_run_1_participant_vals[:, area_index]
+    run_2_array = all_run_2_participant_vals[:, area_index]
+    area_ratio = get_ratio(run_1_array, run_2_array)
+
+    area_ratio = np.array(area_ratio)
+    area_ratio.sort()
+
+    run_1_more_power = 0
+    run_2_more_power = 0
+    for i in area_ratio:
+        if i == 0:
+            run_1_more_power += 1
+
+    for i in area_ratio:
+        if i > 0:
+            run_2_more_power += 1
+
+    pie_data = np.array([run_1_more_power, run_2_more_power])
+    labels = ['Higher run 1 power', 'Higher run 2 power']
+
+    plt.pie(pie_data, labels = labels, autopct='%.1f%%')
+    plt.title(ROI_names[sig_index[area_index]])
+    plt.show()
