@@ -8,7 +8,7 @@ from scipy import stats
 from itertools import zip_longest
 start = time.time()
 
-permutations = 10    # This is the only think that really needs to be changed. default is (10)
+permutations = 1000    # This is the only think that really needs to be changed. default is (10)
 remove_chans = [1, 2, 24, 28, 32, 33, 34, 45, 40, 41, 63, 67, 71, 72, 73, 74]
 
 model = make_pipeline(SVC(C=0.1, kernel='rbf'))
@@ -147,6 +147,7 @@ bands = ['Theta'] * (permutations * 2) + ['Alpha'] * (permutations * 2)
 accuracy = (list(t_arr_1) + list(t_arr_2)) + (list(a_arr_1) + list(a_arr_2))
 df = pd.DataFrame({'accuracy': accuracy, 'bands': bands, 'runs': (runs + runs), 'Areas': (t_areas_1 + t_areas_2 + a_areas_1 + a_areas_2)})
 
+df.to_csv(r'C:\Users\em17531\Documents\fingerprinting_PSD\results_with_1000_permutations')
 print('\n' + "EXECUTION TIME: " + str(time.time() - start) + " sec")
 
 
@@ -160,6 +161,70 @@ def find_common_integers(list_of_lists):
 
     # Convert the result to a list and return
     return list(common_integers)
+
+
+ROI_names = ['Frontal_Sup_Orb_L',
+'Frontal_Med_Orb_L',
+'Frontal_Mid_Orb_L',
+'Frontal_Inf_Orb_L',
+'Frontal_Sup_L' ,
+'Frontal_Mid_L' ,
+'Frontal_Inf_Oper_L' ,
+'Frontal_Inf_Tri_L' ,
+'Frontal_Sup_Medial_L',
+'Supp_Motor_Area_L' ,
+'Paracentral_Lobule_L',
+'Precentral_L' ,
+'Rolandic_Oper_L',
+'Postcentral_L' ,
+'Parietal_Sup_L' ,
+'Parietal_Inf_L' ,
+'SupraMarginal_L',
+'Angular_L' ,
+'Precuneus_L' ,
+'Occipital_Sup_L' ,
+'Occipital_Mid_L',
+'Calcarine_L',
+'Cuneus_L' ,
+'Lingual_L',
+'Heschl_L',
+'Temporal_Sup_L',
+'Temporal_Mid_L',
+'Cingulum_Ant_L',
+'Cingulum_Mid_L',
+'Cingulum_Post_L',
+'Insula_L' ,
+'Frontal_Sup_Orb_R',
+'Frontal_Med_Orb_R',
+'Frontal_Mid_Orb_R',
+'Frontal_Inf_Orb_R',
+'Frontal_Sup_R',
+'Frontal_Mid_R',
+'Frontal_Inf_Oper_R',
+'Frontal_Inf_Tri_R',
+'Frontal_Sup_Medial_R',
+'Supp_Motor_Area_R',
+'Paracentral_Lobule_R',
+'Precentral_R',
+'Rolandic_Oper_R',
+'Postcentral_R',
+'Parietal_Sup_R',
+'Parietal_Inf_R',
+'SupraMarginal_R',
+'Angular_R',
+'Precuneus_R',
+'Occipital_Sup_R',
+'Occipital_Mid_R',
+'Calcarine_R',
+'Cuneus_R',
+'Lingual_R',
+'Heschl_R',
+'Temporal_Sup_R',
+'Temporal_Mid_R',
+'Cingulum_Ant_R',
+'Cingulum_Mid_R',
+'Cingulum_Post_R',
+'Insula_R']
 
 
 def names_of_common_ROI(areas):
