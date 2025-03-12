@@ -5,10 +5,10 @@ import dyconnmap
 start = time.time()
 
 def setup_dependencies():    # Change as desired
-    input_dir = r'C:\Users\em17531\Desktop\OPM_MEG\data\run_1'     # The directory containing files of interest
-    output_dir = r'C:\Users\em17531\Desktop\OPM_MEG\data\Windows_1'    # The output directory
+    input_dir = '/home/sahib/Documents/OPM_MEG/data/run_1'     # The directory containing files of interest
+    output_dir = '/home/sahib/Documents/OPM_MEG/data/Windows_r1_4s'    # The output directory
     target_fb = [[4, 7], [8,12], [13, 30], [31, 40]]  # The target frequency band
-    # TODO: set this up so variable can be a this can be list of bands and each generates it's own adjacency matrix'
+    # TODO: set this up so variable can be a this can be list of bands and each generates its own adjacency matrix
     fs = 1200    # The sampling frequency
     new_shape = (78, 303, 2000)
     saving = True
@@ -54,13 +54,13 @@ def main():
     print('Run set complete' + '\n')
 
     if saving:
-        np.save(output_dir + r'\Windowed_1', np.stack(output_data, axis=0))
+        np.save(output_dir + '/Windowed_4s_r1', np.stack(output_data, axis=0))
 
 
     # RUN 2
     print('Beginning run 2' + '\n')
-    input_dir = r'C:\Users\em17531\Desktop\OPM_MEG\data\run_2'
-    output_dir = r'C:\Users\em17531\Desktop\OPM_MEG\data\Windows_2'
+    input_dir = '/home/sahib/Documents/OPM_MEG/data/run_2'
+    output_dir = '/home/sahib/Documents/OPM_MEG/data/Windows_r1_4s'
 
 
     output_data = []
@@ -73,7 +73,7 @@ def main():
         output_data.append(output_array)
 
     if saving:
-        np.save(output_dir + r'\Windowed_2', np.stack(output_data, axis=0))
+        np.save(output_dir + r'/Windowed_4s_r2', np.stack(output_data, axis=0))
 
 
 if __name__ == "__main__":
