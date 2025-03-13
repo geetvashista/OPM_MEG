@@ -20,7 +20,7 @@ def part_1():
         target_fb = [[4, 7], [8, 12], [13, 30], [31, 40]]  # The target frequency band
         # TODO: set this up so variable can be a this can be list of bands and each generates its own adjacency matrix
         fs = 1200  # The sampling frequency
-        new_shape = (78, 303, 2000)
+        new_shape = (78, 303, 2000)    # TO:DO 
         saving = True
         os.makedirs(output_dir, exist_ok=True)
         return input_dir, output_dir, fs, target_fb, new_shape, saving
