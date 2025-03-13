@@ -96,6 +96,8 @@ def part_2():
     r1 = np.load(r'/home/sahib/Documents/OPM_MEG/data/Windows_1/Windowed_run_1.npy')
     r2 = np.load(r'/home/sahib/Documents/OPM_MEG/data/Windows_2/Windowed_run_2.npy')
 
+    output_dir = '/home/sahib/Documents/OPM_MEG/data/features_4s_windows/'
+
     # Graph calculator function
     def graph_metrics(adj_matrix):  # TODO: Add in stats, maybe nbs? Could use fdc as well?
         # Strength calculator
@@ -182,11 +184,11 @@ def part_2():
         r1_feature_array = np.array(participant_features_r1)
         r2_feature_array = np.array(participant_features_r2)
 
-        np.save(bands[band] + '_r1_feature_array', r1_feature_array)
-        np.save(bands[band] + '_r2_feature_array', r2_feature_array)
+        np.save(output_dir + bands[band] + '_r1_feature_array', r1_feature_array)
+        np.save(output_dir + bands[band] + '_r2_feature_array', r2_feature_array)
 
     # Final feature extraction
-    for i in range(5):
+    for i in range(4):
         feature_extraction(i, r1, r2)
 
     print('\n' + "FINAL EXECUTION TIME: " + str(time.time() - start) + " sec")
@@ -290,23 +292,23 @@ def part_3():
     # Call
 
     # Theta
-    r1 = np.load(r'C:\Users\em17531\Desktop\OPM_MEG\data\Windowed_features\Theta_r1_feature_array.npy')
-    r2 = np.load(r'C:\Users\em17531\Desktop\OPM_MEG\data\Windowed_features\Theta_r2_feature_array.npy')
+    r1 = np.load(r'/home/sahib/Documents/OPM_MEG/data/features_4s_windows/Theta_r1_feature_array.npy')
+    r2 = np.load(r'/home/sahib/Documents/OPM_MEG/data/features_4s_windows/Theta_r2_feature_array.npy')
     t_arr_1, t_arr_2 = fun(r1=r1, r2=r2, model=model, permutations=permutations)
 
     # Alpha
-    r1 = np.load(r'C:\Users\em17531\Desktop\OPM_MEG\data\Windowed_features\Alpha_r1_feature_array.npy')
-    r2 = np.load(r'C:\Users\em17531\Desktop\OPM_MEG\data\Windowed_features\Alpha_r2_feature_array.npy')
+    r1 = np.load(r'/home/sahib/Documents/OPM_MEG/data/features_4s_windows/Alpha_r1_feature_array.npy')
+    r2 = np.load(r'/home/sahib/Documents/OPM_MEG/data/features_4s_windows/Alpha_r2_feature_array.npy')
     a_arr_1, a_arr_2 = fun(r1=r1, r2=r2, model=model, permutations=permutations)
 
     # Beta
-    r1 = np.load(r'C:\Users\em17531\Desktop\OPM_MEG\data\Windowed_features\Beta_r1_feature_array.npy')
-    r2 = np.load(r'C:\Users\em17531\Desktop\OPM_MEG\data\Windowed_features\Beta_r2_feature_array.npy')
+    r1 = np.load(r'/home/sahib/Documents/OPM_MEG/data/features_4s_windows/Beta_r1_feature_array.npy')
+    r2 = np.load(r'/home/sahib/Documents/OPM_MEG/data/features_4s_windows/Beta_r2_feature_array.npy')
     b_arr_1, b_arr_2 = fun(r1=r1, r2=r2, model=model, permutations=permutations)
 
     # Gamma
-    r1 = np.load(r'C:\Users\em17531\Desktop\OPM_MEG\data\Windowed_features\Gamma_r1_feature_array.npy')
-    r2 = np.load(r'C:\Users\em17531\Desktop\OPM_MEG\data\Windowed_features\Gamma_r2_feature_array.npy')
+    r1 = np.load(r'/home/sahib/Documents/OPM_MEG/data/features_4s_windows/Gamma_r1_feature_array.npy')
+    r2 = np.load(r'/home/sahib/Documents/OPM_MEG/data/features_4s_windows/Gamma_r2_feature_array.npy')
     g_arr_1, g_arr_2 = fun(r1=r1, r2=r2, model=model, permutations=permutations)
 
     ### Plotting ###
@@ -317,11 +319,16 @@ def part_3():
 
     runs = [1] * permutations + [2] * permutations
 
-    bands = ['Theta'] * (permutations * 2) + ['Alpha'] * (permutations * 2)
+    bands = (['Theta'] * (permutations * 2) 
+             + ['Alpha'] * (permutations * 2) 
+             + ['Beta'] * (permutations * 2) 
+             + ['Gamma'] * (permutations * 2))
+    
     accuracy = (list(t_arr_1) + list(t_arr_2)) + (list(a_arr_1) + list(a_arr_2)) + (list(b_arr_1) + list(b_arr_2)) + (
             list(g_arr_1) + list(g_arr_2))
 
     df = pd.DataFrame({'accuracy': accuracy, 'bands': bands, 'runs': (runs + runs + runs + runs)})
+    df.to_csv('result_temp')
 
     print('\n' + "EXECUTION TIME: " + str(time.time() - start) + " sec")
 
@@ -329,4 +336,3 @@ def part_3():
     fig_viol = sns.violinplot(data=df, x='bands', y='accuracy', hue="runs", palette="light:#5A9", split=True)
     fig_box.set_title('Fingerprinting accuracy boxplot')
     fig_viol.set_title('Fingerprinting accuracy violin plot')
-
