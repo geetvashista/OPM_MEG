@@ -20,7 +20,7 @@ def part_1():
         target_fb = [[4, 7], [8, 12], [13, 30], [31, 40]]  # The target frequency band
         # TODO: set this up so variable can be a this can be list of bands and each generates its own adjacency matrix
         fs = 1200  # The sampling frequency
-        new_shape = (78, 303, 2000)    # TO:DO 
+        new_shape = (78, 125, 4848)
         saving = True
         os.makedirs(output_dir, exist_ok=True)
         return input_dir, output_dir, fs, target_fb, new_shape, saving
@@ -66,7 +66,7 @@ def part_1():
         # RUN 2
         print('Beginning run 2' + '\n')
         input_dir = '/home/sahib/Documents/OPM_MEG/data/run_2'
-        output_dir = '/home/sahib/Documents/OPM_MEG/data/Windows_r1_4s'
+        output_dir = '/home/sahib/Documents/OPM_MEG/data/Windows_r2_4s'
 
         output_data = []
         for i in target_fb:
@@ -93,8 +93,8 @@ def part_2():
     start = time.time()
 
     # Data pathing and loading
-    r1 = np.load(r'/home/sahib/Documents/OPM_MEG/data/Windows_1/Windowed_run_1.npy')
-    r2 = np.load(r'/home/sahib/Documents/OPM_MEG/data/Windows_2/Windowed_run_2.npy')
+    r1 = np.load(r'/home/sahib/Documents/OPM_MEG/data/Windows_r1_4s/Windowed_4s_r1.npy')
+    r2 = np.load(r'/home/sahib/Documents/OPM_MEG/data/Windows_r2_4s/Windowed_4s_r2.npy')
 
     output_dir = '/home/sahib/Documents/OPM_MEG/data/features_4s_windows/'
 
@@ -312,18 +312,18 @@ def part_3():
     g_arr_1, g_arr_2 = fun(r1=r1, r2=r2, model=model, permutations=permutations)
 
     ### Plotting ###
-    import matplotlib
-    import seaborn as sns
-
-    matplotlib.use('Qt5Agg')
+    # import matplotlib
+    # import seaborn as sns
+    #
+    # matplotlib.use('Qt5Agg')
 
     runs = [1] * permutations + [2] * permutations
 
-    bands = (['Theta'] * (permutations * 2) 
-             + ['Alpha'] * (permutations * 2) 
-             + ['Beta'] * (permutations * 2) 
+    bands = (['Theta'] * (permutations * 2)
+             + ['Alpha'] * (permutations * 2)
+             + ['Beta'] * (permutations * 2)
              + ['Gamma'] * (permutations * 2))
-    
+
     accuracy = (list(t_arr_1) + list(t_arr_2)) + (list(a_arr_1) + list(a_arr_2)) + (list(b_arr_1) + list(b_arr_2)) + (
             list(g_arr_1) + list(g_arr_2))
 
@@ -332,7 +332,13 @@ def part_3():
 
     print('\n' + "EXECUTION TIME: " + str(time.time() - start) + " sec")
 
-    fig_box = sns.boxplot(data=df, x='bands', y='accuracy', hue="runs", width=.5, palette="light:#5A9")
-    fig_viol = sns.violinplot(data=df, x='bands', y='accuracy', hue="runs", palette="light:#5A9", split=True)
-    fig_box.set_title('Fingerprinting accuracy boxplot')
-    fig_viol.set_title('Fingerprinting accuracy violin plot')
+    # fig_box = sns.boxplot(data=df, x='bands', y='accuracy', hue="runs", width=.5, palette="light:#5A9")
+    # fig_viol = sns.violinplot(data=df, x='bands', y='accuracy', hue="runs", palette="light:#5A9", split=True)
+    # fig_box.set_title('Fingerprinting accuracy boxplot')
+    # fig_viol.set_title('Fingerprinting accuracy violin plot')
+
+# --- Main ---
+part_1()
+part_2()
+part_3()
+
