@@ -7,15 +7,15 @@ import pandas as pd
 from scipy import stats
 start = time.time()
 
-permutations = 10    # This is the only think that really needs to be changed. default is (10)
+permutations = 25    # This is the only think that really needs to be changed. default is (10)
 
-model = make_pipeline(SVC(C=0.1, kernel='rbf'))
+model = make_pipeline(SVC(C=0.1, kernel='sigmoid'))    # careful to set kernal correctly ('rbf', 'sigmoid')
 hold = []
 
 def fun(r1, r2, model, permutations):
     # flatten out participants
-    r1 = r1.reshape((2727 + 303), 4, 1, 78)
-    r2 = r2.reshape((2727 + 303), 4, 1, 78)
+    r1 = r1.reshape((125 * 10), 4, 1, 78)
+    r2 = r2.reshape((125 * 10), 4, 1, 78)
     hold = []
     for run in range(permutations):
         r1 = stats.zscore(r1, axis=-1)
@@ -100,42 +100,50 @@ def fun(r1, r2, model, permutations):
 # Call
 
     # Theta
-r1 = np.load(r'C:\Users\em17531\Desktop\OPM_MEG\data\Windowed_features\Theta_r1_feature_array.npy')
-r2 = np.load(r'C:\Users\em17531\Desktop\OPM_MEG\data\Windowed_features\Theta_r2_feature_array.npy')
+r1 = np.load(r'C:\Users\em17531\Desktop\OPM_MEG\data\features_4s_windows\Theta_r1_feature_array.npy')
+r2 = np.load(r'C:\Users\em17531\Desktop\OPM_MEG\data\features_4s_windows\Theta_r2_feature_array.npy')
 t_arr_1, t_arr_2 = fun(r1=r1, r2=r2, model=model, permutations=permutations)
 
     # Alpha
-r1 = np.load(r'C:\Users\em17531\Desktop\OPM_MEG\data\Windowed_features\Alpha_r1_feature_array.npy')
-r2 = np.load(r'C:\Users\em17531\Desktop\OPM_MEG\data\Windowed_features\Alpha_r2_feature_array.npy')
+r1 = np.load(r'C:\Users\em17531\Desktop\OPM_MEG\data\features_4s_windows\Alpha_r1_feature_array.npy')
+r2 = np.load(r'C:\Users\em17531\Desktop\OPM_MEG\data\features_4s_windows\Alpha_r2_feature_array.npy')
 a_arr_1, a_arr_2 = fun(r1=r1, r2=r2, model=model, permutations=permutations)
 
-    # Beta
-r1 = np.load(r'C:\Users\em17531\Desktop\OPM_MEG\data\Windowed_features\Beta_r1_feature_array.npy')
-r2 = np.load(r'C:\Users\em17531\Desktop\OPM_MEG\data\Windowed_features\Beta_r2_feature_array.npy')
+#     # Beta
+r1 = np.load(r'C:\Users\em17531\Desktop\OPM_MEG\data\features_4s_windows\Beta_r1_feature_array.npy')
+r2 = np.load(r'C:\Users\em17531\Desktop\OPM_MEG\data\features_4s_windows\Beta_r2_feature_array.npy')
 b_arr_1, b_arr_2 = fun(r1=r1, r2=r2, model=model, permutations=permutations)
-
-    # Gamma
-r1 = np.load(r'C:\Users\em17531\Desktop\OPM_MEG\data\Windowed_features\Gamma_r1_feature_array.npy')
-r2 = np.load(r'C:\Users\em17531\Desktop\OPM_MEG\data\Windowed_features\Gamma_r2_feature_array.npy')
+#
+#     # Gamma
+r1 = np.load(r'C:\Users\em17531\Desktop\OPM_MEG\data\features_4s_windows\Gamma_r1_feature_array.npy')
+r2 = np.load(r'C:\Users\em17531\Desktop\OPM_MEG\data\features_4s_windows\Gamma_r2_feature_array.npy')
 g_arr_1, g_arr_2 = fun(r1=r1, r2=r2, model=model, permutations=permutations)
+
+# Organize results
+
+runs = [1] * permutations + [2] * permutations
+
+
+bands = ['Theta'] * (permutations * 2) + ['Alpha'] * (permutations * 2) + ['Beta'] * (permutations * 2) + ['Gamma'] * (permutations * 2)
+# bands = ['Theta'] * (permutations * 2) + ['Alpha'] * (permutations * 2)
+accuracy = (list(t_arr_1) + list(t_arr_2)) + (list(a_arr_1) + list(a_arr_2)) + (list(b_arr_1) + list(b_arr_2)) + (list(g_arr_1) + list(g_arr_2))
+# accuracy = (list(t_arr_1) + list(t_arr_2)) + (list(a_arr_1) + list(a_arr_2))
+df = pd.DataFrame({'accuracy': accuracy, 'bands': bands, 'runs': (runs + runs + runs + runs)})
+df.to_csv('sigmoid_4s_windows_25_permutations_all_areas')
+
+print('\n' + "EXECUTION TIME: " + str(time.time() - start) + " sec")
+
 
     ### Plotting ###
 import matplotlib
 import seaborn as sns
 matplotlib.use('Qt5Agg')
 
-
-runs = [1] * permutations + [2] * permutations
-
-
-bands = ['Theta'] * (permutations * 2) + ['Alpha'] * (permutations * 2)
-accuracy = (list(t_arr_1) + list(t_arr_2)) + (list(a_arr_1) + list(a_arr_2)) + (list(b_arr_1) + list(b_arr_2)) + (list(g_arr_1) + list(g_arr_2))
-
-df = pd.DataFrame({'accuracy': accuracy, 'bands': bands, 'runs': (runs + runs + runs + runs)})
-
-print('\n' + "EXECUTION TIME: " + str(time.time() - start) + " sec")
-
-fig_box = sns.boxplot(data=df, x='bands', y='accuracy', hue="runs", width=.5, palette="light:#5A9")
-fig_viol = sns.violinplot(data=df, x='bands', y='accuracy', hue="runs", palette="light:#5A9", split=True)
-fig_box.set_title('Fingerprinting accuracy boxplot')
-fig_viol.set_title('Fingerprinting accuracy violin plot')
+# df = pd.read_excel(r'C:\Users\em17531\Desktop\OPM_MEG\derivatives\df_per_25_accuracy_exc.xlsx')
+# fig = sns.boxplot(data=df, x='bands', y='accuracy', hue="runs", width=.5, palette="light:#5A9")
+fig = sns.violinplot(data=df,
+                     x='bands',
+                     y='accuracy',
+                     hue="runs",
+                     palette="light:#5A9",
+                     split=True).set_title('sigmoid_4s_windows_25_permutations_all_areas')
